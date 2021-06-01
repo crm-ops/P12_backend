@@ -15,6 +15,8 @@
         <th>Name</th>
         <th>First Name</th>
         <th>Last Name</th>
+        <th>SoftDeleted</th>
+
     </tr>
 
     <tr th:each="contact : ${contacts}">
@@ -22,6 +24,7 @@
         <td th:text="${contact.name}">Name</td>
         <td th:text="${contact.firstname}">First Name</td>
         <td th:text="${contact.lastname}">Last Name</td>
+        <td th:text="${contact.softdeleted__c}">SoftDeleted</td>
 
     </tr>
 </table>

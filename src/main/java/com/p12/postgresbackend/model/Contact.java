@@ -17,6 +17,7 @@ public class Contact {
     private String name;
     private String firstname;
     private String lastname;
+    private Boolean softdeleted__c;
 
 
 
@@ -27,12 +28,13 @@ public class Contact {
     public Contact() {
     }
 
-    public Contact(String id, String name, String firstname, String lastname) {
+    public Contact(String id, String name, String firstname, String lastname, Boolean softdeleted__c) {
 
         this.id = id;
         this.name = name;
         this.firstname=firstname;
         this.lastname= lastname;
+        this.softdeleted__c=softdeleted__c;
 
     }
 
@@ -52,7 +54,7 @@ public class Contact {
         return firstname;
     }
 
-    public void setfirstname(String firstname) {
+    public void setFirstname(String firstname) {
         this.firstname = firstname;
     }
 
@@ -64,6 +66,13 @@ public class Contact {
         this.lastname = lastname;
     }
 
+    public Boolean getSoftdeleted__c() {
+        return softdeleted__c;
+    }
+
+    public void setSoftdeleted__c( Boolean softdeleted__c) {
+        this.softdeleted__c = softdeleted__c;
+    }
 
 
     @Override
@@ -73,6 +82,7 @@ public class Contact {
         hash = 79 * hash + Objects.hashCode(this.name);
         hash = 79 * hash + Objects.hashCode(this.firstname);
         hash = 79 * hash + Objects.hashCode(this.lastname);
+        hash = 79 * hash + Objects.hashCode(this.softdeleted__c);
 
         return hash;
     }
@@ -101,6 +111,9 @@ public class Contact {
         if (!Objects.equals(this.lastname, other.lastname)) {
             return false;
         }
+        if (!Objects.equals(this.softdeleted__c, other.softdeleted__c)) {
+            return false;
+        }
 
 
         return Objects.equals(this.id, other.id);
@@ -112,7 +125,8 @@ public class Contact {
         sb.append("id=").append(id);
         sb.append(", name='").append(name).append('\'');
         sb.append(", firstname='").append(firstname).append('\'');
-        sb.append(", lastname=").append(lastname);
+        sb.append(", lastname='").append(lastname).append('\'');
+        sb.append(", softdeleted__c=").append(softdeleted__c);
         sb.append('}');
         return sb.toString();
     }
