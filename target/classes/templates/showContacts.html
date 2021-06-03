@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Contacts</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+<h2>List of contacts</h2>
+
+<table>
+    <tr>
+        <th align="left">Id</th>
+        <th align="left">SfId</th>
+        <th align="left">First Name</th>
+        <th align="left">Last Name</th>
+        <th align="left">Email</th>
+        <th align="left">AccountId</th>
+        <th align="left">MailingCity</th>
+        <th align="left">Integration Email</th>
+
+
+    </tr>
+
+    <tr th:each="contact : ${contacts}">
+        <td align="left" th:text="${contact.id}">Id</td>
+        <td align="left" th:text="${contact.sfId}">SfId</td>
+        <td align="left" th:text="${contact.firstname}">First Name</td>
+        <td align="left" th:text="${contact.lastname}">Last Name</td>
+        <td align="left" th:text="${contact.email}">Email</td>
+        <td align="left" th:text="${contact.accountid}">AccountId</td>
+        <td align="left" th:text="${contact.mailingcity}">mailingcity</td>
+        <td align="left" th:text="${contact.integration_email__c}">Integration Email</td>
+
+
+    </tr>
+</table>
+
+</body>
+</html>

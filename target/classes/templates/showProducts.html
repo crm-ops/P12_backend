@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Products</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+<h2>List of products</h2>
+
+<table>
+    <tr>
+
+        <th align="left">Id</th>
+        <th align="left">Sfid</th>
+        <th align="left">Product Name</th>
+        <th align="left">Product Family</th>
+        <th align="left">Display URL</th>
+        <th align="left">Created Date</th>
+        
+
+
+
+    </tr>
+
+    <tr th:each="product : ${products}">
+        <td align="left" th:text="${product.id}">Id</td>
+        <td align="left" th:text="${product.sfid}">Sfid</td>
+        <td align="left" th:text="${product.name}">Product Name</td>
+        <td align="left" th:text="${product.family}">Product Family</td>
+        <td align="left" th:text="${product.displayurl}">Display URL</td>
+        <td align="left" th:text="${product.createddate}">Created Date</td>
+
+
+
+    </tr>
+</table>
+
+</body>
+</html>
