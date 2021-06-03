@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT $JAVA_OPTS -jar target/postgresbackend-1.0.jar
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar target/postgresbackend-1.0.jar -Dspring.profiles.active=dev
