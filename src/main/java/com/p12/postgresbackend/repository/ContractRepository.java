@@ -15,6 +15,8 @@ public interface ContractRepository extends CrudRepository<Contract, Long> {
 
     Contract findByIntegrationcontractid(String integrationcontractid);
 
+
+    Contract findBySfid(String sfid);
 }
 
 

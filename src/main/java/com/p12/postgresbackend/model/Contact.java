@@ -5,11 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Objects;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "contact")
@@ -19,7 +15,8 @@ public class Contact {
     @GeneratedValue(strategy = GenerationType.AUTO, generator="native")
     @GenericGenerator(name = "native",strategy = "native")
     private Long id;
-    private String integration_email__c;
+    @Column(name="integration_email__c")
+    private String integrationemail;
     private String sfid;
     private String firstname;
     private String lastname;
@@ -40,16 +37,17 @@ public class Contact {
 
 
 
-    public Contact(Long id, String sfid, String firstname, String lastname, String email, String accountid, String mailingcity, String integration_email__c, Boolean isdeleted) {
+    public Contact(Long id,String integrationemail, String sfid, String firstname, String lastname, String email, String accountid, String mailingcity,  Boolean isdeleted) {
 
         this.id = id;
+        this.integrationemail=integrationemail;
         this.sfid=sfid;
         this.firstname=firstname;
         this.lastname= lastname;
         this.email=email;
         this.accountid=accountid;
         this.mailingcity=mailingcity;
-        this.integration_email__c=integration_email__c;
+
         this.isdeleted=isdeleted;
 
 
@@ -59,11 +57,17 @@ public class Contact {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getSfId() {
         return sfid;
     }
 
-
+    public void setSfid(String sfid) {
+        this.sfid = sfid;
+    }
 
     public String getFirstname() {
         return firstname;
@@ -105,12 +109,12 @@ public class Contact {
         this.mailingcity = mailingcity;
     }
 
-    public String getIntegration_email__c() {
-        return integration_email__c;
+    public String getIntegrationemail() {
+        return integrationemail;
     }
 
-    public void setIntegration_email__c(String integration_email__c) {
-        this.integration_email__c = integration_email__c;
+    public void setIntegrationemail(String integrationemail) {
+        this.integrationemail= integrationemail;
     }
 
 
@@ -133,7 +137,7 @@ public class Contact {
         hash = 79 * hash + Objects.hashCode(this.email);
         hash = 79 * hash + Objects.hashCode(this.accountid);
         hash = 79 * hash + Objects.hashCode(this.mailingcity);
-        hash = 79 * hash + Objects.hashCode(this.integration_email__c);
+        hash = 79 * hash + Objects.hashCode(this.integrationemail);
         hash = 79 * hash + Objects.hashCode(this.isdeleted);
 
         return hash;
@@ -178,7 +182,7 @@ public class Contact {
             return false;
         }
 
-        if (!Objects.equals(this.integration_email__c, other.integration_email__c)) {
+        if (!Objects.equals(this.integrationemail, other.integrationemail)) {
             return false;
         }
 
@@ -199,7 +203,7 @@ public class Contact {
         sb.append(", email='").append(email).append('\'');
         sb.append(", accountid='").append(accountid).append('\'');
         sb.append(", mailingcity='").append(mailingcity).append('\'');
-        sb.append(", integration_email__c='").append(integration_email__c).append('\'');
+        sb.append(", integrationemail='").append(integrationemail).append('\'');
         sb.append(", isdeleted=").append(isdeleted);
         sb.append('}');
         return sb.toString();
@@ -215,8 +219,7 @@ public class Contact {
         jo.put("email",email);
         jo.put("accountid",accountid);
         jo.put("mailingcity",mailingcity);
-        jo.put("integration_email__c",integration_email__c);
-
+        jo.put("integrationemail",integrationemail);
         jo.put("isdeleted",isdeleted);
         return jo;
     }

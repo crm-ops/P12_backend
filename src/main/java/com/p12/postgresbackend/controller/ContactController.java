@@ -24,7 +24,7 @@ public class ContactController {
     @Autowired
     private IContactService contactService;
 
-    @GetMapping("/showContacts")
+    @GetMapping("/showContacts") // test ok
     public String showContacts(Model model) {
 
         var contacts = (List<Contact>) contactService.findAll();
@@ -35,7 +35,7 @@ public class ContactController {
     }
 
 
-    @GetMapping("/getContacts")
+    @GetMapping("/getContacts") //test ok
     @ResponseBody
     public List<Contact> getContacts(Model model) throws JSONException {
 
@@ -44,44 +44,187 @@ public class ContactController {
     }
 
 
-    @PostMapping("/saveContact")
+    @GetMapping("/getContactByEmail") //test ok
     @ResponseBody
-    public Map<String,String> saveContact(@RequestParam(value = "integration_email__c", defaultValue = "john@doe.com", required=false) String integration_email__c, @RequestBody String payload) throws JsonProcessingException {
+    public Contact getContactByEmail(@RequestParam(value = "email", defaultValue = "john@doe.com", required=false) String email) throws JSONException {
+
+        var contact = (Contact) contactService.getContactByEmail(email);
+        return contact;
+    }
+
+
+    @GetMapping("/getContactByIntegrationEmail") //test ok
+    @ResponseBody
+    public Contact getContactByIntegrationEmail(@RequestParam(value = "integrationemail", defaultValue = "john@doe.com", required=false) String integrationemail) throws JSONException {
+
+        var contact = (Contact) contactService.getContactByIntegrationemail(integrationemail);
+        return contact;
+    }
+
+
+    @GetMapping("/getContactById")
+    @ResponseBody
+    public Contact getContactById(@RequestParam(value = "id", defaultValue = "0", required=false) Long id) throws JSONException {
+            Contact con = new Contact();
+
+            var val = contactService.findById(id);
+            if(val.isPresent()) {
+                System.out.println("Content of val >"+val.get());
+                con.setId(val.get().getId());
+                con.setFirstname(val.get().getFirstname());
+                con.setEmail(val.get().getEmail());
+                con.setMailingcity(val.get().getMailingcity());
+                con.setAccountid(val.get().getAccountid());
+                con.setLastame(val.get().getLastname());
+                con.setIntegrationemail(val.get().getIntegrationemail());
+                con.setSfid(val.get().getSfId());
+            } else {
+                con.setId(Long.valueOf("-1"));
+                con.setFirstname("notfound");
+                con.setEmail("notfound");
+                con.setMailingcity("notfound");
+                con.setAccountid("notfound");
+                con.setLastame("notfound");
+                con.setIntegrationemail("notfound");
+                con.setSfid("notfound");
+
+            }
+
+
+
+    return con;
+    }
+
+
+    @GetMapping("/getContactBySfid") //
+    @ResponseBody
+    public Contact getContactBySfid(@RequestParam(value = "sfid", defaultValue = "0", required = false) String sfid) throws JSONException {
+
+        var contact = (Contact) contactService.getContactBySfid(sfid);
+        return contact;
+    }
+
+
+
+    @PostMapping("/insertContact")  //test ok returning Id
+    @ResponseBody
+    public String insertContact(@RequestParam(value = "integrationemail", defaultValue = "john@doe.com", required=false) String integrationemail, @RequestBody String payload) throws JsonProcessingException, InterruptedException {
+
+     //   HashMap<String, String> map = new HashMap<>();
+
+
+
+
+        Contact lookupcontactbyemail = contactService.getContactByEmail(integrationemail);
+        Contact lookupcontactbyintegrationemail = contactService.getContactByIntegrationemail(integrationemail);
+        String returnedContactId="";
+
+        if (lookupcontactbyemail.getSfId() == "notfound" && lookupcontactbyintegrationemail.getSfId() == "notfound") {
+
+           // map.put("integrationemail", integrationemail);
+           // map.put("object", payload.toString());
+
+            ObjectMapper mapper = new ObjectMapper();
+            Contact tmpctc = mapper.readValue(payload.toString(), Contact.class);
+            System.out.println("tmpcontact is > " + tmpctc.toString());
+
+            Contact finalctc = new Contact();
+            finalctc.setEmail(tmpctc.getEmail());
+            finalctc.setIntegrationemail(tmpctc.getIntegrationemail());
+            finalctc.setFirstname(tmpctc.getFirstname());
+            finalctc.setLastame(tmpctc.getLastname());
+            finalctc.setMailingcity(tmpctc.getMailingcity());
+            finalctc.setAccountid(tmpctc.getAccountid());
+
+            System.out.println("Generated final contact from json is > " + finalctc.toString());
+
+             returnedContactId=contactService.insertContact(finalctc);
+
+
+
+
+
+
+
+
+        } else if (lookupcontactbyemail.getEmail()!="notfound") {
+
+            System.out.println("contact email field was matched - sfid is  >" + lookupcontactbyemail.getSfId());
+
+            returnedContactId=lookupcontactbyemail.getId().toString();
+
+        } else if (lookupcontactbyintegrationemail.getIntegrationemail()!="notfound") {
+            System.out.println("contact integrationemail field was matched - sfid is  >" + lookupcontactbyintegrationemail.getSfId());
+            returnedContactId=lookupcontactbyintegrationemail.getId().toString();
+
+        }
+
+
+
+        return  returnedContactId;
+    }
+
+
+
+//updateContact looks for a contact in Salesforce comparing request parameter integration_email__c with both salesforce standard email field and integration_email__c field
+// if a match is found for either of those, the record content is replaced by the payload content according to the mapping - the sfid is returned to the caller
+// if a match is not found a message is returned to the caller saying the record does not exist
+    @PostMapping("/updateContact")
+    @ResponseBody
+    public String updateContact(@RequestParam(value = "integrationemail", defaultValue = "john@doe.com", required=false) String integrationemail, @RequestBody String payload) throws JsonProcessingException {
         // String payloadstr = payload.toString();
-        HashMap<String, String> map = new HashMap<>();
-        map.put("integration_email__c", integration_email__c);
-        map.put("object", payload.toString());
-        System.out.println("payloadtostring is > "+payload.toString());
-        ObjectMapper mapper = new ObjectMapper();
-        Contact tmpctc = mapper.readValue(payload.toString(), Contact.class);
 
-        Contact finalctc= new Contact();
-        finalctc.setEmail(tmpctc.getEmail());
-        finalctc.setIntegration_email__c(tmpctc.getEmail());
-        finalctc.setFirstname(tmpctc.getFirstname());
-        finalctc.setLastame(tmpctc.getLastname());
-        finalctc.setMailingcity(tmpctc.getMailingcity());
-        finalctc.setAccountid(tmpctc.getAccountid());
-        finalctc.setIsDeleted(false);
+        Contact lookupcontactbyemail = contactService.getContactByEmail(integrationemail);
+        Contact lookupcontactbyintegrationemail = contactService.getContactByIntegrationemail(integrationemail);
+        String returnedContactId="";
 
-        System.out.println("Generated contact from json is > "+finalctc.toString());
+        if (lookupcontactbyemail.getSfId() != "notfound" || lookupcontactbyintegrationemail.getSfId() != "notfound") {
 
-        String savedContactSfid=contactService.saveContact(finalctc);
+            // map.put("integrationemail", integrationemail);
+            // map.put("object", payload.toString());
 
-        System.out.println("Saved contactId is >"+ savedContactSfid);
-        map.put("contactSfId",savedContactSfid);
+            ObjectMapper mapper = new ObjectMapper();
+            Contact tmpctc = mapper.readValue(payload.toString(), Contact.class);
+            System.out.println("tmpcontact is > " + tmpctc.toString());
 
-        return map;
+            Contact finalctc = new Contact();
+            finalctc.setEmail(tmpctc.getEmail());
+            finalctc.setIntegrationemail(tmpctc.getIntegrationemail());
+            finalctc.setFirstname(tmpctc.getFirstname());
+            finalctc.setLastame(tmpctc.getLastname());
+            finalctc.setMailingcity(tmpctc.getMailingcity());
+            finalctc.setAccountid(tmpctc.getAccountid());
+
+            System.out.println("Generated final contact from json is > " + finalctc.toString());
+
+            returnedContactId=contactService.updateContact(finalctc);
+
+
+        } else if (lookupcontactbyemail.getEmail()=="notfound") {
+
+            System.out.println("contact email field was not matched - sfid is  >" + lookupcontactbyemail.getSfId());
+
+            returnedContactId="-1";
+
+        } else if (lookupcontactbyintegrationemail.getIntegrationemail()=="notfound") {
+            System.out.println("contact integrationemail field was matched - sfid is  >" + lookupcontactbyintegrationemail.getSfId());
+            returnedContactId="-1";
+
+        }
+
+
+
+        return  returnedContactId;
     }
 
 
 
 
-    @GetMapping("/getContactSfidByemail")
+    @GetMapping("/getContactSfidByemail") //test ok
     @ResponseBody
-    public Map<String,String> getContactByEmail(@RequestParam(value = "integration_email__c", defaultValue = "john@doe.com", required=false) String integration_email__c) {
+    public Map<String,String> getContactSfidByEmail(@RequestParam(value = "integrationemail", defaultValue = "john@doe.com", required=false) String integrationemail) {
 
-        String sfid = contactService.getContactSfId(integration_email__c);
+        String sfid = contactService.getContactSfIdByEmail(integrationemail);
 
         Map<String, String> map = new HashMap<>();
         map.put("sfid", sfid);
@@ -90,11 +233,15 @@ public class ContactController {
     }
 
 
+
+
+
+
     @GetMapping("/deleteContactByEmail")
     @ResponseBody
-    public Map<String,String> softdeleteContactByEmail(@RequestParam(value = "integration_email__c", defaultValue = "john@doe.com", required=false) String integration_email__c) {
+    public String deleteContactByEmail(@RequestParam(value = "integrationemail", defaultValue = "john@doe.com", required=false) String integrationemail) {
 
-        Map<String,String> deletedContact = contactService.deleteContact(integration_email__c);
+        String deletedContact = contactService.deleteContact(integrationemail);
 
 
         return deletedContact;
@@ -102,14 +249,6 @@ public class ContactController {
 
 
 
-
-    //updateOrInsertContact
-    //lookup the contact in salesforce
-        //if email exist and all other fields are the same > return Salesforce Id to calling app
-
-        //if email exist AXG Contact fields are different and not null > update SF and return Id
-
-        //if AXG Contact email does not exist > insert contact and return id
 
 
 

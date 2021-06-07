@@ -1,6 +1,7 @@
 package com.p12.postgresbackend.service;
 
 
+import com.p12.postgresbackend.model.Contact;
 import com.p12.postgresbackend.model.Contract;
 import com.p12.postgresbackend.repository.ContractRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ContractService implements IContractService {
@@ -24,6 +26,26 @@ public class ContractService implements IContractService {
         return Contracts;
     }
 
+    @Override
+    public Optional<Contract> findById(Long id) {
+
+        return repository.findById(id);
+    }
+
+
+    @Override
+    public Contract getContractBySfid(String sfid) {
+
+        return repository.findBySfid(sfid);
+    }
+
+    @Override
+    public Contract getContractByIntegrationcontractid(String integrationcontractid) {
+
+        return repository.findByIntegrationcontractid(integrationcontractid);
+    }
+
+
 
     @Override
     public String saveContract(Contract Contract) throws InterruptedException {
@@ -37,7 +59,7 @@ public class ContractService implements IContractService {
             System.out.println("No Existing Contract in DB with reference > " + Contract.getIntegrationcontractid() + " ... inserting new record");
             Contract savedContract = repository.save(Contract);
 
-            Thread.sleep(750);
+
             savedContract = repository.findByIntegrationcontractid(Contract.getIntegrationcontractid());
 
             System.out.println("Retrieved saved Contract from DB with integrationcontractid > " + savedContract.getIntegrationcontractid() + " \n");
@@ -77,7 +99,7 @@ public class ContractService implements IContractService {
 
         if (repository.findByIntegrationcontractid(Integrationcontractid) == null) {
 
-            sfid = "Contract inexistant or not synchronized yet";
+            sfid = "notfound";
 
         } else {
 
@@ -90,6 +112,8 @@ public class ContractService implements IContractService {
 
 
     }
+
+
 
 
 

@@ -9,6 +9,7 @@ com/p12/postgresbackend/repository/ContractRepository.class
 com/p12/postgresbackend/service/ContractService.class
 com/p12/postgresbackend/controller/ContractController.class
 com/p12/postgresbackend/repository/ContactRepository.class
+com/p12/postgresbackend/Database/DatabaseConfig.class
 com/p12/postgresbackend/service/IProductService.class
 com/p12/postgresbackend/controller/ContactController.class
 com/p12/postgresbackend/service/IContactService.class

@@ -8,6 +8,7 @@ import com.p12.postgresbackend.repository.ContactRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,61 +29,142 @@ public class ContactService implements IContactService {
 
 
     @Override
-    public String saveContact(Contact contact) {
+    public Optional<Contact> findById(Long id) {
 
-
-        Contact foundContact;
-        String returnedSfid;
-
-        if (repository.findByEmail(contact.getEmail()) == null) {
-
-            System.out.println("No Existing contact in DB with email > " + contact.getEmail() + " ... inserting new record");
-            Contact savedcontact = repository.save(contact);
-
-            savedcontact = repository.findByEmail(contact.getEmail());
-
-            System.out.println("Retrieved saved contact from DB with email > " + savedcontact.getEmail() + " \n");
-            System.out.println("Retrieved saved contact from DB with sfid > " + savedcontact.getSfId());
-
-            returnedSfid = savedcontact.getSfId();
-
-
-        } else {
-
-            foundContact = repository.findByEmail(contact.getEmail());
-            System.out.println("Existing contact in DB with email > " + contact.getEmail() + " and with sfid " + foundContact.getSfId());
-            foundContact.setFirstname(contact.getFirstname());
-            foundContact.setLastame(contact.getLastname());
-            foundContact.setEmail(contact.getIntegration_email__c());
-            foundContact.setIntegration_email__c(contact.getIntegration_email__c());
-            foundContact.setMailingcity(contact.getMailingcity());
-
-            returnedSfid = foundContact.getSfId();
-
-            repository.save(foundContact);
-
-
-        }
-
-        return returnedSfid;
+        return repository.findById(id);
     }
 
 
     @Override
-    public String getContactSfId(String email) {
+    public String insertContact(Contact contact) {
 
-        String sfid;
 
-        if (repository.findByEmail(email) == null) {
+        Contact foundContactByEmail;
+        Contact foundContactByintegrationemail;
+        String returnedId = "";
 
-            sfid = "contact inexistant or not synchronized yet";
+        if (repository.findByEmail(contact.getEmail()) == null && repository.findByIntegrationemail(contact.getIntegrationemail()) == null) {
+
+            System.out.println("No Existing contact in DB with email > " + contact.getEmail() + " ... inserting new record");
+            Contact savedcontact = repository.save(contact);
+
+
+            System.out.println("Retrieved saved contact from DB with email > " + savedcontact.getEmail() + " \n");
+            System.out.println("Retrieved saved contact from DB with sfid > " + savedcontact.getSfId());
+
+            returnedId = savedcontact.getId().toString();
+
 
         } else {
 
-            sfid = repository.findByEmail(email).getSfId();
+            foundContactByEmail = repository.findByEmail(contact.getEmail());
+            foundContactByintegrationemail = repository.findByIntegrationemail(contact.getIntegrationemail());
+
+            if (foundContactByEmail.getSfId() != "notfound") {
+
+                System.out.println("Existing contact in DB with email > " + foundContactByEmail.getEmail() + " and with sfid " + foundContactByEmail.getSfId());
+                returnedId = foundContactByEmail.getId().toString();
+
+            } else if (foundContactByintegrationemail.getSfId() != "notfound") {
+
+                returnedId = foundContactByintegrationemail.getId().toString();
+            }
 
 
         }
+
+        return returnedId;
+
+
+    }
+
+
+    @Override
+    public String updateContact(Contact contact) {
+
+
+        Contact foundContactByEmail;
+        Contact foundContactByintegrationemail;
+        String returnedId = "";
+
+        if (repository.findByEmail(contact.getEmail()) != null || repository.findByIntegrationemail(contact.getIntegrationemail()) != null) {
+
+            Contact tomodifyCtc = new Contact();
+
+            if(contact.getEmail()!=null){
+                tomodifyCtc= repository.findByEmail(contact.getEmail());
+            } else
+            {
+                tomodifyCtc= repository.findByIntegrationemail(contact.getIntegrationemail());
+            }
+
+            System.out.println("Existing contact in DB with email > " + contact.getEmail() +" or integration email > " +contact.getIntegrationemail()+ " ... updating record");
+
+
+            contact.setId(tomodifyCtc.getId());
+
+            Contact savedcontact = repository.save(contact);
+
+
+
+            returnedId = savedcontact.getId().toString();
+
+
+        } else {
+
+            foundContactByEmail = repository.findByEmail(contact.getEmail());
+            foundContactByintegrationemail = repository.findByIntegrationemail(contact.getIntegrationemail());
+
+            if (foundContactByEmail.getSfId() == "notfound") {
+
+                System.out.println("Contact not found in DB with email > " + foundContactByEmail.getEmail());
+                returnedId = "-1";
+
+            } else if (foundContactByintegrationemail.getSfId() == "notfound") {
+
+                returnedId = "-1";
+            }
+
+
+        }
+
+        return returnedId;
+
+
+    }
+
+
+    @Override
+    public String getContactSfIdByEmail(String email) {
+
+
+        String sfid = "";
+
+        if (repository.findByEmail(email) == null && repository.findByIntegrationemail(email) == null) {
+
+            sfid = "no Sfid matched in salesforce for either email >" + email;
+
+
+        } else {
+
+
+            System.out.println("value of repository.findByEmail(email).getSfId()>" + repository.findByEmail(email).toString());
+
+            if (repository.findByEmail(email).getSfId() != null) {
+                sfid = repository.findByEmail(email).getSfId();
+            } else if (repository.findByIntegrationemail(email).getSfId() != null) {
+                sfid = repository.findByIntegrationemail(email).getSfId();
+            } else if (repository.findByEmail(email).getSfId() == "nofound") {
+                sfid = "notfound";
+            } else if (repository.findByIntegrationemail(email).getSfId() == "notfound") {
+                sfid = "notfound";
+            } else {
+                sfid = "we have a functional problem houston";
+            }
+
+
+        }
+
 
         return sfid;
 
@@ -90,30 +172,114 @@ public class ContactService implements IContactService {
     }
 
 
-
-
-
-
     @Override
-    public Map<String,String> deleteContact(String email) {
+    public Contact getContactByEmail(String email) {
 
-        Map<String,String> deletedContact = new HashMap<>();
+        Contact returnedContact = new Contact();
 
         if (repository.findByEmail(email) == null) {
 
-            deletedContact.put(email, "not found");
+            returnedContact.setAccountid("notfound");
+            returnedContact.setMailingcity("notfound");
+            returnedContact.setIntegrationemail("notfound");
+            returnedContact.setSfid("notfound");
+            returnedContact.setEmail("notfound");
+            returnedContact.setFirstname("notfound");
+            returnedContact.setLastame("notfound");
 
         } else {
-            Contact contacttodel = repository.findByEmail(email);
 
-            repository.delete(contacttodel);
+            returnedContact = repository.findByEmail(email);
 
-            deletedContact.put(email,"deleted in heroku db");
 
         }
 
-        return deletedContact;
+        return returnedContact;
 
 
     }
-}
+
+
+
+
+
+        @Override
+        public Contact getContactBySfid (String sfid){
+
+            Contact returnedContact = new Contact();
+
+            if (repository.findBySfid(sfid) == null) {
+
+                returnedContact.setAccountid("notfound");
+                returnedContact.setMailingcity("notfound");
+                returnedContact.setIntegrationemail("notfound");
+                returnedContact.setSfid("notfound");
+                returnedContact.setEmail("notfound");
+                returnedContact.setFirstname("notfound");
+                returnedContact.setLastame("notfound");
+
+            } else {
+
+                returnedContact = repository.findBySfid(sfid);
+
+
+            }
+
+            return returnedContact;
+
+
+        }
+
+
+        @Override
+        public Contact getContactByIntegrationemail (String integrationemail){
+
+            Contact returnedContact = new Contact();
+
+            if (repository.findByIntegrationemail(integrationemail) == null) {
+
+                returnedContact.setAccountid("notfound");
+                returnedContact.setMailingcity("notfound");
+                returnedContact.setIntegrationemail("notfound");
+                returnedContact.setSfid("notfound");
+                returnedContact.setEmail("notfound");
+                returnedContact.setFirstname("notfound");
+                returnedContact.setLastame("notfound");
+
+            } else {
+
+                returnedContact = repository.findByIntegrationemail(integrationemail);
+
+
+            }
+
+            return returnedContact;
+
+
+        }
+
+
+        @Override
+        public String deleteContact (String email){
+
+            String deletedContact= "";
+
+            if (repository.findByEmail(email) == null) {
+
+                deletedContact="notFound";
+
+            } else {
+                Contact contacttodel = repository.findByEmail(email);
+
+                repository.delete(contacttodel);
+
+                deletedContact=contacttodel.getSfId();
+
+            }
+
+            return deletedContact;
+
+
+        }
+    }
+
