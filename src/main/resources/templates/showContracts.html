@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Contracts</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+<h2>List of contracts</h2>
+
+<table>
+    <tr>
+
+        <th align="left">Id</th>
+        <th align="left">SfId</th>
+        <th align="left">Description</th>
+        <th align="left">AccountId</th>
+        <th align="left">Status</th>
+        <th align="left">StartDate</th>
+        <th align="left">Contract Terms</th>
+        <th align="left">Special Terms</th>
+        <th align="left">Integration Contract Id</th>
+
+
+
+
+    </tr>
+
+    <tr th:each="contract : ${contracts}">
+        <td align="left" th:text="${contract.id}">Id</td>
+        <td align="left" th:text="${contract.sfid}">SfId</td>
+        <td align="left" th:text="${contract.description}">Description</td>
+        <td align="left" th:text="${contract.accountid}">AccountId</td>
+        <td align="left" th:text="${contract.status}">Status</td>
+        <td align="left" th:text="${contract.startdate}">StartDate</td>
+        <td align="left" th:text="${contract.contractterm}">Contract Terms</td>
+        <td align="left" th:text="${contract.specialterms}">Special Terms</td>
+        <td align="left" th:text="${contract.integrationcontractid}">Integration Contract Id</td>
+
+
+
+    </tr>
+</table>
+
+</body>
+</html>

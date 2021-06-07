@@ -1,22 +1,29 @@
 package com.p12.postgresbackend.model;
 
+import org.hibernate.annotations.GenericGenerator;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Objects;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "contact")
 public class Contact {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
-    private String name;
+    @GeneratedValue(strategy = GenerationType.AUTO, generator="native")
+    @GenericGenerator(name = "native",strategy = "native")
+    private Long id;
+    @Column(name="integration_email__c")
+    private String integrationemail;
+    private String sfid;
     private String firstname;
     private String lastname;
+    private String email;
+    private String accountid;
+    private String mailingcity;
+    private Boolean isdeleted = false;
 
 
 
@@ -27,32 +34,46 @@ public class Contact {
     public Contact() {
     }
 
-    public Contact(String id, String name, String firstname, String lastname) {
+
+
+
+    public Contact(Long id,String integrationemail, String sfid, String firstname, String lastname, String email, String accountid, String mailingcity,  Boolean isdeleted) {
 
         this.id = id;
-        this.name = name;
+        this.integrationemail=integrationemail;
+        this.sfid=sfid;
         this.firstname=firstname;
         this.lastname= lastname;
+        this.email=email;
+        this.accountid=accountid;
+        this.mailingcity=mailingcity;
+
+        this.isdeleted=isdeleted;
+
 
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getSfId() {
+        return sfid;
+    }
+
+    public void setSfid(String sfid) {
+        this.sfid = sfid;
     }
 
     public String getFirstname() {
         return firstname;
     }
 
-    public void setfirstname(String firstname) {
+    public void setFirstname(String firstname) {
         this.firstname = firstname;
     }
 
@@ -64,15 +85,60 @@ public class Contact {
         this.lastname = lastname;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAccountid() {
+        return accountid;
+    }
+
+    public void setAccountid(String accountid) {
+        this.accountid = accountid;
+    }
+
+    public String getMailingcity() {
+        return mailingcity;
+    }
+
+    public void setMailingcity(String mailingcity) {
+        this.mailingcity = mailingcity;
+    }
+
+    public String getIntegrationemail() {
+        return integrationemail;
+    }
+
+    public void setIntegrationemail(String integrationemail) {
+        this.integrationemail= integrationemail;
+    }
+
+
+    public Boolean getIsDeleted() {
+        return isdeleted;
+    }
+
+    public void setIsDeleted( Boolean isdeleted) {
+        this.isdeleted = isdeleted;
+    }
 
 
     @Override
     public int hashCode() {
         int hash = 7;
         hash = 79 * hash + Objects.hashCode(this.id);
-        hash = 79 * hash + Objects.hashCode(this.name);
+        hash = 79 * hash + Objects.hashCode(this.sfid);
         hash = 79 * hash + Objects.hashCode(this.firstname);
         hash = 79 * hash + Objects.hashCode(this.lastname);
+        hash = 79 * hash + Objects.hashCode(this.email);
+        hash = 79 * hash + Objects.hashCode(this.accountid);
+        hash = 79 * hash + Objects.hashCode(this.mailingcity);
+        hash = 79 * hash + Objects.hashCode(this.integrationemail);
+        hash = 79 * hash + Objects.hashCode(this.isdeleted);
 
         return hash;
     }
@@ -90,9 +156,11 @@ public class Contact {
         }
         final Contact other = (Contact) obj;
 
-        if (!Objects.equals(this.name, other.name)) {
+        if (!Objects.equals(this.sfid, other.sfid)) {
             return false;
         }
+
+
 
         if (!Objects.equals(this.firstname, other.firstname)) {
             return false;
@@ -102,18 +170,58 @@ public class Contact {
             return false;
         }
 
+        if (!Objects.equals(this.email, other.email)) {
+            return false;
+        }
+
+        if (!Objects.equals(this.accountid, other.accountid)) {
+            return false;
+        }
+
+        if (!Objects.equals(this.mailingcity, other.mailingcity)) {
+            return false;
+        }
+
+        if (!Objects.equals(this.integrationemail, other.integrationemail)) {
+            return false;
+        }
+
+        if (!Objects.equals(this.isdeleted, other.isdeleted)) {
+            return false;
+        }
 
         return Objects.equals(this.id, other.id);
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("City{");
+        final StringBuilder sb = new StringBuilder("Contact{");
         sb.append("id=").append(id);
-        sb.append(", name='").append(name).append('\'');
+        sb.append("sfid=").append(sfid);
         sb.append(", firstname='").append(firstname).append('\'');
-        sb.append(", lastname=").append(lastname);
+        sb.append(", lastname='").append(lastname).append('\'');
+        sb.append(", email='").append(email).append('\'');
+        sb.append(", accountid='").append(accountid).append('\'');
+        sb.append(", mailingcity='").append(mailingcity).append('\'');
+        sb.append(", integrationemail='").append(integrationemail).append('\'');
+        sb.append(", isdeleted=").append(isdeleted);
         sb.append('}');
         return sb.toString();
     }
+
+
+    public JSONObject toJson() throws JSONException {
+        final JSONObject jo = new JSONObject();
+        jo.put("id",id);
+        jo.put("sfid", sfid);
+        jo.put("fistname",firstname);
+        jo.put("lastname",lastname);
+        jo.put("email",email);
+        jo.put("accountid",accountid);
+        jo.put("mailingcity",mailingcity);
+        jo.put("integrationemail",integrationemail);
+        jo.put("isdeleted",isdeleted);
+        return jo;
+    }
+
 }
