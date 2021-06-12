@@ -96,10 +96,14 @@ public class ContractController {
 
     @PostMapping("/insertContract")
     @ResponseBody
-    public Map<String,String> insertContract(@RequestParam(value = "integrationcontractid", defaultValue = "john@doe.com") String integrationcontractid, @RequestBody String payload) throws JsonProcessingException, InterruptedException {
+    public Map<String,String> insertContract(@RequestBody String payload) throws JsonProcessingException, InterruptedException {
+
 
         //does the contract exist in the db
-        String  lookupsfid = contractService.getContractSfId(integrationcontractid);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Contract tmpctc = mapper.readValue(payload.toString(), Contract.class);
+        String  lookupsfid = contractService.getContractSfId(tmpctc.getIntegrationcontractid());
 
         // if lookup contract is null > save a new ontract
 
@@ -110,12 +114,11 @@ public class ContractController {
         HashMap<String, String> map = new HashMap<>();
 
         if (lookupsfid=="notfound") {
-            System.out.println("request integrationcontractid value " + integrationcontractid);
+            System.out.println("request integrationcontractid value " + tmpctc.getIntegrationcontractid());
 
 
-            map.put("integrationcontractid", integrationcontractid);
-            ObjectMapper mapper = new ObjectMapper();
-            Contract tmpctc = mapper.readValue(payload.toString(), Contract.class);
+            map.put("integrationcontractid", tmpctc.getIntegrationcontractid());
+
 
             Contract finalctc = new Contract();
             finalctc.setStatus(tmpctc.getStatus());
@@ -124,13 +127,13 @@ public class ContractController {
             finalctc.setDescription(tmpctc.getDescription());
             finalctc.setContractterm(tmpctc.getContractterm());
             finalctc.setAccountid(tmpctc.getAccountid());
-            finalctc.setintegrationcontractid(integrationcontractid);
+            finalctc.setintegrationcontractid(tmpctc.getIntegrationcontractid());
 
 
             System.out.println("Generated Contract from json is > " + finalctc.toString());
 
             String savedContractSfid = contractService.saveContract(finalctc);
-            Contract savedcontactobject= getContractByIntegrationcontractid(integrationcontractid);
+            Contract savedcontactobject= getContractByIntegrationcontractid(tmpctc.getIntegrationcontractid());
 
             System.out.println("Saved ContractId is >" + savedContractSfid);
 
