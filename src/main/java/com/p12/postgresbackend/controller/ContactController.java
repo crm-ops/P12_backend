@@ -108,15 +108,17 @@ public class ContactController {
 
     @PostMapping("/insertContact")  //test ok returning Id
     @ResponseBody
-    public String insertContact(@RequestParam(value = "integrationemail", defaultValue = "john@doe.com", required=false) String integrationemail, @RequestBody String payload) throws JsonProcessingException, InterruptedException {
+    public String insertContact(@RequestBody String payload) throws JsonProcessingException, InterruptedException {
 
      //   HashMap<String, String> map = new HashMap<>();
 
 
+        ObjectMapper mapper = new ObjectMapper();
+        Contact tmpctc = mapper.readValue(payload.toString(), Contact.class);
+        System.out.println("tmpcontact is > " + tmpctc.toString());
 
-
-        Contact lookupcontactbyemail = contactService.getContactByEmail(integrationemail);
-        Contact lookupcontactbyintegrationemail = contactService.getContactByIntegrationemail(integrationemail);
+        Contact lookupcontactbyemail = contactService.getContactByEmail(tmpctc.getEmail());
+        Contact lookupcontactbyintegrationemail = contactService.getContactByIntegrationemail(tmpctc.getIntegrationemail());
         String returnedContactId="";
 
         if (lookupcontactbyemail.getSfId() == "notfound" && lookupcontactbyintegrationemail.getSfId() == "notfound") {
@@ -124,9 +126,7 @@ public class ContactController {
            // map.put("integrationemail", integrationemail);
            // map.put("object", payload.toString());
 
-            ObjectMapper mapper = new ObjectMapper();
-            Contact tmpctc = mapper.readValue(payload.toString(), Contact.class);
-            System.out.println("tmpcontact is > " + tmpctc.toString());
+
 
             Contact finalctc = new Contact();
             finalctc.setEmail(tmpctc.getEmail());
@@ -159,7 +159,7 @@ public class ContactController {
 
         }
 
-
+        returnedContactId = "{\"id\":\""+returnedContactId+"\"}";
 
         return  returnedContactId;
     }
@@ -213,7 +213,7 @@ public class ContactController {
         }
 
 
-
+        returnedContactId = "{\"id\":\""+returnedContactId+"\"}";
         return  returnedContactId;
     }
 
